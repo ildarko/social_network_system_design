@@ -1,0 +1,337 @@
+openapi: 3.0.3
+info:
+  title: Social Network App - OpenAPI 3.0
+  description: This is a system design Social Network Server based on the OpenAPI 3.0 specification.  
+  
+  license:
+    name: MIT
+    url: https://mit-license.org/
+  version: 1.0.0
+
+servers:
+  - url: https://localohst/api/v1
+tags:
+  - name: article
+    description: Посты
+    
+  - name: comment
+    description: Комменты
+    
+  - name: subscription
+    description: Подписки
+paths:
+  /posts:
+    get:
+      tags:
+        - article      
+      description: Список постов для пользователя
+      
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostsReponse'          
+        
+        '422':
+          description: Validation exception
+          
+    post:
+      tags:
+        - article      
+      description: Поиск постов
+      requestBody:       
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SearchPost'
+      
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostsReponse'          
+        
+        '422':
+          description: Validation exception
+          
+
+  /post/{postId}:
+    post:
+      tags:
+        - article      
+      description: Обновление\вставка поста by Id     
+      parameters:
+                -   $ref: '#/components/parameters/postId'
+      requestBody:       
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Post'
+          
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/SuccessfulOperation'          
+            
+        '400':
+          description: Invalid ID supplied
+        '404':
+          description: Post not found
+        '422':
+          description: Validation exception
+          
+    delete:
+      tags:
+        - article      
+      description: Удаление текущего поста by PostId      
+      parameters:
+        -   $ref: '#/components/parameters/postId'               
+      
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/SuccessfulOperation'          
+            
+        '400':
+          description: Invalid ID supplied
+        '404':
+          description: Post not found
+        '422':
+          description: Validation exception
+    
+  /post/{postId}/rating/:
+    post:
+      tags:
+        - article     
+      description: Добавление оценки к посту by PostId     
+      parameters:
+        -   $ref: '#/components/parameters/postId'         
+      
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/SuccessfulOperation'          
+            
+        '400':
+          description: Invalid ID supplied
+        '404':
+          description: Post not found
+        '422':
+          description: Validation exception      
+            
+    delete:
+      tags:
+        - article
+      summary: Удаление оценки к посту 
+      parameters:
+        -   $ref: '#/components/parameters/postId' 
+      
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/SuccessfulOperation'          
+            
+        '400':
+          description: Invalid PostID supplied
+        '404':
+          description: Post not found
+        '422':
+          description: Validation exception
+            
+  /post/{postId}/comment/{commentId}:
+    post:
+      tags:
+        - comment      
+      description: Добавление\обновление коммента к посту by postId      
+      parameters:
+        -   $ref: '#/components/parameters/postId'
+        -   $ref: '#/components/parameters/commentId'
+      requestBody:
+        description: Update\Insert comment to an existent post in the store
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Comment'
+          
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/SuccessfulOperation'          
+            
+        '400':
+          description: Invalid commentId supplied
+        '404':
+          description: Post not found
+        '422':
+          description: Validation exception          
+  
+    delete:
+      tags:
+        - comment      
+      description: Удаление коммента CommentId к посту PostId     
+      parameters:        
+        -   $ref: '#/components/parameters/postId'
+        -   $ref: '#/components/parameters/commentId'          
+        
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/SuccessfulOperation'
+        '400':
+          description: Invalid commentId supplied
+        '404':
+          description: Post not found
+          
+  /subscription/{userId}:
+    get:
+      tags:
+        - subscription      
+      description: подписка на пользователя UserId     
+      parameters:
+        -   $ref: '#/components/parameters/userId'
+      
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/SuccessfulOperation'          
+            
+        '400':
+          description: Invalid UserID supplied
+        '404':
+          description: UserID not found
+        '422':
+          description: Validation exception  
+
+    delete:
+      tags:
+        - subscription      
+      description: Отписка от пользователя UserId     
+      parameters:
+        -   $ref: '#/components/parameters/userId'
+      
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/SuccessfulOperation'          
+            
+        '400':
+          description: Invalid UserID supplied
+        '404':
+          description: UserID not found
+        '422':
+          description: Validation exception
+  
+components:
+  parameters:
+    postId:
+      type: integer
+      format: int64
+    
+    commentId:
+      type: integer
+      format: int64
+    
+    userId:
+      type: integer
+      format: int64
+          
+          
+  schemas:
+  
+    PostsReponse:
+      description: список постов
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/Post'
+  
+    Post:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        
+        userId:
+            description: Пользователь, создавший пост
+            $ref: '#/components/parameters/userId'
+        
+        title:
+          type: string
+          description: Заголовок поста
+          
+        description:
+          type: string
+          description: Содержание поста
+          
+        images:
+          type: array
+          items:
+            type: string
+            
+    SearchPost:
+      type: object
+      properties:
+        containsInDescription:
+          type: string
+          description: Содержится в посте
+          
+        containsInTitle:
+          type: string
+          description: Содержится в заголовке
+          
+    Comment:
+      type: object
+      properties:
+        content:
+          type: string
+          description: Комментарий пользователя
+          
+    
+  responses:
+    SuccessfulResponse:
+        description: General successful response
+        content:
+                application/json:
+                    schema:
+                        type: object
+                        properties:
+                            entityId:
+                              type: integer
+                              format: int64
+                            message:
+                              type: string
+                              description: server message
+                              
